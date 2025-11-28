@@ -1,10 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { hashEmail } from '../utils/hash';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const isOnAvatarsPage = location.pathname === '/avatars';
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
@@ -17,9 +19,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <span className="hidden sm:inline">grofile</span>
           </Link>
           <nav className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
-            <Link to="/avatars" className="text-sm font-medium text-gray-300 hover:text-gray-100 whitespace-nowrap">
-              Avatars
-            </Link>
+            {!isOnAvatarsPage && (
+              <Link to="/avatars" className="text-sm font-medium text-gray-300 hover:text-gray-100 whitespace-nowrap">
+                Avatars
+              </Link>
+            )}
             {user ? (
               <Link
                 to={`/profile/${hashEmail(user.email)}`}
