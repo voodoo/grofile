@@ -7,6 +7,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const { user } = useAuth();
   const location = useLocation();
   const isOnAvatarsPage = location.pathname === '/avatars';
+  const isOnProfilePage = user && location.pathname === `/profile/${hashEmail(user.email)}`;
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
@@ -16,7 +17,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
               G
             </div>
-            <span className="hidden sm:inline">grofile</span>
+            <span className="hidden sm:inline">GROFILE</span>
           </Link>
           <nav className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
             {!isOnAvatarsPage && (
@@ -25,12 +26,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               </Link>
             )}
             {user ? (
-              <Link
-                to={`/profile/${hashEmail(user.email)}`}
-                className="text-sm font-medium bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-blue-700 transition-colors whitespace-nowrap"
-              >
-                Profile
-              </Link>
+              !isOnProfilePage && (
+                <Link
+                  to={`/profile/${hashEmail(user.email)}`}
+                  className="text-sm font-medium bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-blue-700 transition-colors whitespace-nowrap"
+                >
+                  Profile
+                </Link>
+              )
             ) : (
               <>
                 <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-gray-100 whitespace-nowrap">
@@ -53,7 +56,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </main>
       <footer className="bg-gray-800 border-t border-gray-700 mt-auto">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} grofile. All rights reserved.
+          © {new Date().getFullYear()} GROFILE. All rights reserved.
         </div>
       </footer>
     </div>

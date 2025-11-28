@@ -189,10 +189,16 @@ export const ProfileView: React.FC = () => {
               </div>
 
               {isOwnProfile && (
-                <div className="mt-6 pt-6 border-t border-gray-700">
+                <div className="mt-6 pt-6 border-t border-gray-700 flex items-center gap-4">
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="text-sm font-medium bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={handleSignOut}
-                    className="text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
+                    className="text-sm font-medium bg-gray-700 text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     Sign out
                   </button>
