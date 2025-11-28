@@ -1,7 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { hashEmail } from '../utils/hash';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
       <header className="bg-gray-800 border-b border-gray-700 sticky top-0 z-10">
@@ -16,16 +20,27 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <Link to="/avatars" className="text-sm font-medium text-gray-300 hover:text-gray-100 whitespace-nowrap">
               Avatars
             </Link>
-            <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-gray-100 whitespace-nowrap">
-              Log in
-            </Link>
-            <Link
-              to="/"
-              className="text-sm font-medium bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-blue-700 transition-colors whitespace-nowrap"
-            >
-              <span className="hidden sm:inline">Create your Gravatar</span>
-              <span className="sm:hidden">Create</span>
-            </Link>
+            {user ? (
+              <Link
+                to={`/profile/${hashEmail(user.email)}`}
+                className="text-sm font-medium bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-blue-700 transition-colors whitespace-nowrap"
+              >
+                Profile
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-gray-100 whitespace-nowrap">
+                  Log in
+                </Link>
+                <Link
+                  to="/"
+                  className="text-sm font-medium bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-full hover:bg-blue-700 transition-colors whitespace-nowrap"
+                >
+                  <span className="hidden sm:inline">Create your Gravatar</span>
+                  <span className="sm:hidden">Create</span>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>

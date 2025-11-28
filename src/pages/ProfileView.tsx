@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { hashEmail } from '../utils/hash';
+import { useAuth } from '../context/AuthContext';
 import { ArrowLeft } from 'lucide-react';
 
 interface ProfileData {
@@ -16,6 +17,15 @@ export const ProfileView: React.FC = () => {
   const { hash } = useParams<{ hash: string }>();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const isOwnProfile = user && hash && hashEmail(user.email) === hash;
+
+  const handleSignOut = () => {
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     if (!hash) {
@@ -177,6 +187,17 @@ export const ProfileView: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {isOwnProfile && (
+                <div className="mt-6 pt-6 border-t border-gray-700">
+                  <button
+                    onClick={handleSignOut}
+                    className="text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

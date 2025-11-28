@@ -303,18 +303,23 @@ export const Dashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button
-                      type="submit"
-                      className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Save size={18} />
-                      Save Profile
-                    </button>
-                    {saveSuccess && (
-                      <span className="text-sm text-green-400 flex items-center gap-1">
-                        <Check size={16} />
-                        Profile saved!
-                      </span>
+                    {!saveSuccess ? (
+                      <button
+                        type="submit"
+                        className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Save size={18} />
+                        Save Profile
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 cursor-not-allowed"
+                      >
+                        <Check size={18} />
+                        Saved
+                      </button>
                     )}
                   </div>
                 </form>
