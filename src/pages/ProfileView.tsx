@@ -25,26 +25,41 @@ export const ProfileView: React.FC = () => {
 
     // Look up profile by hash
     const storedAvatars = JSON.parse(localStorage.getItem('avatars') || '{}');
+    const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}');
     const storedUser = localStorage.getItem('user');
     
     // Find email that matches this hash
     let foundProfile: ProfileData | null = null;
+    let foundEmail: string | null = null;
 
-    // Check stored avatars
-    for (const [email, url] of Object.entries(storedAvatars)) {
+    // Check stored profiles first (most complete data)
+    for (const [email, profile] of Object.entries(storedProfiles)) {
       if (hashEmail(email) === hash) {
-        foundProfile = {
-          email,
-          avatarUrl: url as string,
-        };
+        foundEmail = email;
+        foundProfile = profile as ProfileData;
         break;
       }
     }
 
+    // If not found in profiles, check stored avatars
+    if (!foundProfile) {
+      for (const [email, url] of Object.entries(storedAvatars)) {
+        if (hashEmail(email) === hash) {
+          foundEmail = email;
+          foundProfile = {
+            email,
+            avatarUrl: url as string,
+          };
+          break;
+        }
+      }
+    }
+
     // Check current user
-    if (storedUser) {
+    if (!foundProfile && storedUser) {
       const user = JSON.parse(storedUser);
       if (hashEmail(user.email) === hash) {
+        foundEmail = user.email;
         foundProfile = {
           email: user.email,
           avatarUrl: user.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`,
@@ -56,20 +71,14 @@ export const ProfileView: React.FC = () => {
       }
     }
 
-    // If we found an avatar but not full profile, try to get profile from user storage
-    if (foundProfile && !foundProfile.name) {
-      // Check if there's a stored user with this email
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        if (user.email === foundProfile.email) {
-          foundProfile = {
-            ...foundProfile,
-            name: user.name,
-            bio: user.bio,
-            location: user.location,
-            website: user.website,
-          };
-        }
+    // If we found an email but not full profile, try to get from profiles storage
+    if (foundEmail && foundProfile) {
+      if (storedProfiles[foundEmail]) {
+        // Merge with stored profile to get all fields including location
+        foundProfile = {
+          ...foundProfile,
+          ...(storedProfiles[foundEmail] as ProfileData),
+        };
       }
     }
 
@@ -148,22 +157,20 @@ export const ProfileView: React.FC = () => {
                 </div>
               )}
 
-              <div className="space-y-3">
-                {profile.location && (
-                  <div>
-                    <span className="text-sm font-semibold text-gray-300">Location: </span>
-                    <span className="text-gray-400">{profile.location}</span>
-                  </div>
-                )}
+              <div className="space-y-4 mt-6 border-t border-gray-700 pt-6">
+                <div className="flex items-start gap-2">
+                  <span className="text-sm font-semibold text-gray-300 min-w-[80px]">Location:</span>
+                  <span className="text-gray-400">{profile.location || 'Not specified'}</span>
+                </div>
 
                 {profile.website && (
-                  <div>
-                    <span className="text-sm font-semibold text-gray-300">Website: </span>
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm font-semibold text-gray-300 min-w-[80px]">Website:</span>
                     <a
                       href={profile.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 underline"
+                      className="text-blue-400 hover:text-blue-300 underline break-all"
                     >
                       {profile.website}
                     </a>

@@ -36,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = (email: string) => {
     // Check if we have an existing user stored
     const storedUser = localStorage.getItem('user');
+    const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}');
     let newUser: User;
     
     if (storedUser) {
@@ -44,20 +45,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (parsedUser.email === email) {
         newUser = parsedUser;
       } else {
-        // Different email, create new user but check for stored avatar
+        // Different email, check for stored profile
+        if (storedProfiles[email]) {
+          newUser = storedProfiles[email];
+        } else {
+          newUser = { email, avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${email}` };
+          const storedAvatars = JSON.parse(localStorage.getItem('avatars') || '{}');
+          if (storedAvatars[email]) {
+            newUser.avatarUrl = storedAvatars[email];
+          }
+        }
+      }
+    } else {
+      // No stored user, check for stored profile
+      if (storedProfiles[email]) {
+        newUser = storedProfiles[email];
+      } else {
         newUser = { email, avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${email}` };
         const storedAvatars = JSON.parse(localStorage.getItem('avatars') || '{}');
         if (storedAvatars[email]) {
           newUser.avatarUrl = storedAvatars[email];
         }
-      }
-    } else {
-      // No stored user, create new one
-      newUser = { email, avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${email}` };
-      // Check if we have a stored avatar for this email
-      const storedAvatars = JSON.parse(localStorage.getItem('avatars') || '{}');
-      if (storedAvatars[email]) {
-        newUser.avatarUrl = storedAvatars[email];
       }
     }
     
@@ -80,6 +88,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedAvatars = JSON.parse(localStorage.getItem('avatars') || '{}');
       storedAvatars[user.email] = url;
       localStorage.setItem('avatars', JSON.stringify(storedAvatars));
+      
+      // Also update profile storage
+      const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}');
+      if (storedProfiles[user.email]) {
+        storedProfiles[user.email] = { ...storedProfiles[user.email], avatarUrl: url };
+        localStorage.setItem('profiles', JSON.stringify(storedProfiles));
+      }
     }
   };
 
@@ -88,6 +103,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedUser = { ...user, ...profile };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Store full profile permanently by email
+      const storedProfiles = JSON.parse(localStorage.getItem('profiles') || '{}');
+      storedProfiles[user.email] = updatedUser;
+      localStorage.setItem('profiles', JSON.stringify(storedProfiles));
     }
   };
 

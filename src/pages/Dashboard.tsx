@@ -11,6 +11,7 @@ export const Dashboard: React.FC = () => {
     name: '',
     bio: '',
     location: '',
+    websiteProtocol: 'https',
     website: '',
   });
   const [copied, setCopied] = useState(false);
@@ -18,11 +19,26 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (user) {
+      // Parse protocol from existing website URL
+      let websiteProtocol = 'https';
+      let website = user.website || '';
+      
+      if (website) {
+        if (website.startsWith('http://')) {
+          websiteProtocol = 'http';
+          website = website.replace('http://', '');
+        } else if (website.startsWith('https://')) {
+          websiteProtocol = 'https';
+          website = website.replace('https://', '');
+        }
+      }
+      
       setProfileData({
         name: user.name || '',
         bio: user.bio || '',
         location: user.location || '',
-        website: user.website || '',
+        websiteProtocol: websiteProtocol,
+        website: website,
       });
     }
   }, [user]);
@@ -33,7 +49,15 @@ export const Dashboard: React.FC = () => {
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile(profileData);
+    // Combine protocol and website
+    const websiteUrl = profileData.website 
+      ? `${profileData.websiteProtocol}://${profileData.website.replace(/^https?:\/\//, '')}`
+      : '';
+    
+    updateProfile({
+      ...profileData,
+      website: websiteUrl,
+    });
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
@@ -258,14 +282,25 @@ export const Dashboard: React.FC = () => {
                     <label htmlFor="website" className="block text-sm font-medium text-gray-300 mb-1">
                       Website
                     </label>
-                    <input
-                      id="website"
-                      type="url"
-                      placeholder="https://example.com"
-                      className="w-full px-4 py-2 rounded-lg border border-gray-600 bg-gray-700 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
-                      value={profileData.website}
-                      onChange={(e) => handleProfileChange('website', e.target.value)}
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        id="websiteProtocol"
+                        className="px-3 py-2 rounded-lg border border-gray-600 bg-gray-700 text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                        value={profileData.websiteProtocol}
+                        onChange={(e) => handleProfileChange('websiteProtocol', e.target.value)}
+                      >
+                        <option value="https">HTTPS</option>
+                        <option value="http">HTTP</option>
+                      </select>
+                      <input
+                        id="website"
+                        type="text"
+                        placeholder="example.com"
+                        className="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-gray-700 text-gray-100 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                        value={profileData.website}
+                        onChange={(e) => handleProfileChange('website', e.target.value)}
+                      />
+                    </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
