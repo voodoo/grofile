@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { hashEmail } from '../utils/hash';
 
 interface AvatarItem {
@@ -60,9 +61,10 @@ export const AvatarsList: React.FC = () => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {avatars.map((avatar) => (
-          <div
+          <Link
             key={avatar.hash}
-            className="flex flex-col items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors"
+            to={`/profile/${avatar.hash}`}
+            className="flex flex-col items-center p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-blue-500 hover:border-2 transition-all cursor-pointer"
           >
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-gray-700 mb-2 bg-gray-700">
               <img
@@ -71,7 +73,7 @@ export const AvatarsList: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

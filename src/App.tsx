@@ -6,6 +6,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Avatar } from './pages/Avatar';
 import { AvatarsList } from './pages/AvatarsList';
+import { ProfileView } from './pages/ProfileView';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -27,6 +28,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/avatars" element={<AvatarsList />} />
             <Route path="/avatar/:hash" element={<Avatar />} />
+            <Route path="/profile/:hash" element={<ProfileView />} />
             <Route 
               path="/dashboard" 
               element={
